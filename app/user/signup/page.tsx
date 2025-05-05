@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -14,19 +22,61 @@ export default function SignUpPage() {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpInput, setShowOtpInput] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [error, setError] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendTimer]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmAccountCreation = async () => {
     setIsLoading(true);
     setError("");
+    setShowConfirmation(false);
 
     try {
       // Mock API call to send OTP
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setShowOtpInput(true);
+      setResendTimer(30);
+      setCanResend(false);
     } catch (err) {
       setError("Failed to send OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Mock API call to resend OTP
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setResendTimer(30);
+      setCanResend(false);
+    } catch (err) {
+      setError("Failed to resend OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +135,7 @@ export default function SignUpPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending OTP...
+                    Processing...
                   </>
                 ) : (
                   "Continue"
@@ -107,24 +157,74 @@ export default function SignUpPage() {
                   className="w-full"
                 />
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  "Verify OTP"
-                )}
-              </Button>
+              <div className="flex items-center justify-between">
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    "Verify OTP"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleResendOtp}
+                  disabled={!canResend || isLoading}
+                  className="ml-2"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : canResend ? (
+                    "Resend OTP"
+                  ) : (
+                    `Resend in ${resendTimer}s`
+                  )}
+                </Button>
+              </div>
             </form>
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Account</DialogTitle>
+            <DialogDescription>
+              We'll create a new account for {email}. An OTP will be sent to this email address for verification.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmation(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmAccountCreation}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
