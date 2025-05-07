@@ -73,6 +73,10 @@ export default function HomePage() {
     );
   };
 
+  const handleGalleryClick = (libraryId: number) => {
+    router.push(`/gallery/${libraryId}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
@@ -124,9 +128,10 @@ export default function HomePage() {
           {libraries.map((library) => (
             <MagicCard
               key={library.id}
-              className="p-0 overflow-hidden"
+              className="p-0 overflow-hidden cursor-pointer"
               gradientFrom="#4F46E5"
               gradientTo="#7C3AED"
+              onClick={() => handleGalleryClick(library.id)}
             >
               <div className="aspect-video relative">
                 <img
@@ -141,21 +146,30 @@ export default function HomePage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => router.push(`/gallery/${library.id}`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/gallery/${library.id}`);
+                    }}
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDeleteLibrary(library.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteLibrary(library.id);
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => togglePublish(library.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePublish(library.id);
+                    }}
                   >
                     {library.isPublished ? (
                       <Globe className="h-4 w-4 text-green-500" />

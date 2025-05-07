@@ -66,3 +66,70 @@ Menu items can appear in a dropdown or side-drawer format.
 - Error and success messages must be clearly visible but not intrusive.
 - Responsive design for mobile, tablet, and desktop.
 - Avoid clutter; focus on core input and call-to-action elements.
+
+## Gallery Page
+
+The **Gallery Page** is where users can view, edit, and manage the photos inside a selected library (gallery). It maintains the same layout and styling consistency as the rest of the application and provides a clean interface to organize up to 20 photos per gallery.
+
+## Source File
+
+```ts
+app/gallery/page.tsx
+```
+### Page Structure & Components
+1. Header
+Reuse the same Navbar component as on the Home page.
+
+Must remain consistent in design and responsiveness (App name with logo on the left, navigation links or hamburger menu on the right).
+
+2. Gallery Title
+Display the title of the selected gallery at the top.
+
+The title should be editable inline or via a small edit icon (🖉).
+
+Validation: Title cannot be empty; auto-save or confirm on blur.
+
+3. Photo Grid (Max 20)
+Display existing photos in a grid layout.
+
+Each photo card includes:
+
+Image preview
+
+Delete icon to remove the photo from the gallery
+
+Optional caption or title editing (if needed)
+
+4. Add Photo
+Include an “Add Photo” button or card to upload new images.
+
+Enforce a maximum of 20 photos per gallery.
+
+Uploaded photos should appear immediately in the grid, preserving insertion order.
+
+Consider drag-and-drop support for better UX.
+
+5. Footer Actions
+A “Save Gallery” button to persist all changes:
+
+Gallery title
+
+Added or deleted photos
+
+A Publish/Unpublish toggle icon:
+
+Reflects the gallery’s current visibility status
+
+API call triggered on toggle action
+
+📱 Responsive Behavior
+Gallery grid and action buttons must scale properly across all screen sizes.
+
+Use a column-based layout:
+
+1-column on mobile
+
+3–4 columns on desktop
+
+🧑‍💻 Developer Notes
+Max photo limit (20) should be enforced both on the frontend and in backend validation.
