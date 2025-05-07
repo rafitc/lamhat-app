@@ -90,7 +90,7 @@ export default function SignUpPage() {
     try {
       // Mock API call to verify OTP
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push("/home/dashboard");
+      router.push("/home");
     } catch (err) {
       setError("Invalid OTP. Please try again.");
     } finally {
